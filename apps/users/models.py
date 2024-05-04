@@ -1,13 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator 
+from django.contrib.auth import get_user_model
 import random
 
 phone_regex = RegexValidator(regex=r'^\+996\d{9}$', message="Номер телефона необходимо ввести в формате: '+996xxxxxxxxx'.")
 
 class User(AbstractUser):
     phone_number = models.CharField(validators=[phone_regex], max_length=15, verbose_name='Номер телефона')
-    age = models.IntegerField(verbose_name='Возраст')
+    age = models.IntegerField(default=0, verbose_name='Возраст')
     wallet_address = models.CharField(max_length=12,blank=True ,verbose_name='ID кошелька')
     balance = models.PositiveIntegerField(default=0, verbose_name='Баланс')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан в')
@@ -32,22 +33,24 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
-    
+
+FromUser = get_user_model()
+
 class TransfersHistory(models.Model):
-    from_user = models.ForeignKey(User, related_name='transfers_sent', on_delete=models.CASCADE,verbose_name='Sender' )
-    to_user = models.ForeignKey(User, related_name='transfers_received', on_delete=models.CASCADE, verbose_name='recipient')
+    from_user = models.ForeignKey(FromUser, related_name='transfers_sent', on_delete=models.CASCADE,verbose_name='Отправитель' )
+    to_user = models.ForeignKey(User, related_name='transfers_received', on_delete=models.CASCADE, verbose_name='Получатель')
     is_completed = models.BooleanField(default=False, verbose_name='Сделано')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан в')
     amount = models.PositiveIntegerField(default=0, verbose_name='Сумма')
     
     def save(self, *args, **kwargs):            
         if self.is_completed:
-            raise ValueError("Транзакция прошла успешна")
+            raise ValueError("Транзакция прошла не успешна")
+
         
         if not self.is_completed:
             from_user_balance = self.from_user.balance
             to_user_wallet = self.to_user.balance
-            raise ValueError("Транзакция прошла не успешна")
 
         if from_user_balance < self.amount:
             raise ValueError("Недостаточно средств на вашем балансе")
