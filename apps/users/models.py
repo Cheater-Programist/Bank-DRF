@@ -7,7 +7,7 @@ phone_regex = RegexValidator(regex=r'^\+996\d{9}$', message="Номер теле
 
 class User(AbstractUser):
     phone_number = models.CharField(validators=[phone_regex], max_length=15, verbose_name='Номер телефона')
-    age = models.IntegerField(default=0, verbose_name='Возраст')
+    age = models.IntegerField(verbose_name='Возраст')
     wallet_address = models.CharField(max_length=12,blank=True ,verbose_name='ID кошелька')
     balance = models.PositiveIntegerField(default=0, verbose_name='Баланс')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан в')
