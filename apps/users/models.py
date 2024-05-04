@@ -20,7 +20,7 @@ class User(AbstractUser):
             while not unique_wallet_address:
                 for i in range(12):
                     wallet_id = random.randrange(0,10)
-                    wallet_address += wallet_id
+                    wallet_address += str(wallet_id)
                 if not User.objects.filter(wallet_address=wallet_address).exists():
                     unique_wallet_address = True
             self.wallet_address = wallet_address

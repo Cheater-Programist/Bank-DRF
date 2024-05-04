@@ -13,7 +13,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User 
         fields = ('id', 'username', 'first_name', 
-                  'last_name', 'password', 'confirm_password')
+                  'last_name','age', 'password', 'confirm_password')
         
     def validate(self, attrs):
         if len(attrs['password']) < 8:
